@@ -1,3 +1,3 @@
-*.html linguist-language=Jinja
+*.html linguist-language=Django
 core/* linguist-language=Python
 *.py linguist-language=Python
