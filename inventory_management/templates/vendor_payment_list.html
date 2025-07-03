@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Vendor Purchases</h2>
+    <a href="{% url 'vendor-purchase-add' %}" class="btn btn-primary">Add New Purchase</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Vendor</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price/Unit</th>
+                <th>Total Paid</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for purchase in purchases %}
+                {% for item in purchase.items.all %}
+                <tr>
+                    <td>{{ purchase.vendor.name }}</td>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₹{{ item.price_per_unit }}</td>
+                    <td>₹{{ purchase.total_paid }}</td>
+                    <td>{{ purchase.purchase_date|date:"M d, Y" }}</td>
+                    <td>
+                        <a href="{% url 'vendor-purchase-edit' purchase.id %}" class="btn btn-sm btn-info">Edit</a>
+                        <a href="{% url 'vendor-purchase-delete' purchase.id %}" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center">No purchases found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

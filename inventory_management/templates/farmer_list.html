@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Farmers</h2>
+    <a href="{% url 'farmer-add' %}" class="btn btn-primary">Add New Farmer</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Name</th>
+                <th>Mobile</th>
+                <th>Address</th>
+                <th>Due Balance</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for f in farmers %}
+            <tr>
+                <td>{{ f.name }}</td>
+                <td>{{ f.mobile }}</td>
+                <td>{{ f.address }}</td>
+                <td>₹{{ f.due_balance|floatformat:2 }}</td>
+                <td>
+                    <a href="{% url 'farmer-edit' f.id %}" class="btn btn-sm btn-info">Edit</a>
+                    <a href="{% url 'farmer-delete' f.id %}" class="btn btn-sm btn-danger">Delete</a>
+                    <a href="{% url 'payment-add' %}" class="btn btn-sm btn-success">Record Payment</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No farmers found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

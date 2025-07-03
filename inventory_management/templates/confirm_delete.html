@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card mt-4">
+    <div class="card-header bg-danger text-white">
+        <h2>Confirm Deletion</h2>
+    </div>
+    <div class="card-body">
+        <p class="card-text">Are you sure you want to delete this {{ type }}: <strong>{{ obj.name|default:obj }}</strong>?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+            <a href="{% if type == 'Vendor' %}{% url 'vendor-list' %}{% elif type == 'Farmer' %}{% url 'farmer-list' %}{% elif type == 'Product' %}{% url 'product-list' %}{% elif type == 'Vendor Purchase' %}{% url 'vendor-purchase-list' %}{% elif type == 'Vendor Payment' %}{% url 'vendor-payment-list' %}{% endif %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

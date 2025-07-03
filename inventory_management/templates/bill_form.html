@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white">
+        <h2>Create New Bill</h2>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Bill Main Form -->
+            <h3>Bill Details</h3>
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+
+            <!-- Payment Status -->
+            <div class="form-group">
+                <label for="id_payment_status">Payment Status</label>
+                <select name="payment_status" class="form-control" id="id_payment_status">
+                    <option value="paid">Paid</option>
+                    <option value="not_paid">Not Paid</option>
+                </select>
+            </div>
+
+            <hr>
+
+            <!-- Bill Items Formset -->
+            <h3>Bill Items</h3>
+            <div id="formset-container">
+                {{ formset.management_form }}
+                {% for item_form in formset %}
+                    <div class="form-row border p-3 mb-2 bg-light rounded">
+                        {% for field in item_form %}
+                            <div class="col-md-{% if field.name == 'product' %}6{% else %}3{% endif %} form-group">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Add Item Button -->
+            <button type="button" class="btn btn-info add-item-btn">Add Another Item</button>
+            <hr>
+
+            <!-- Submit Buttons -->
+            <button type="submit" class="btn btn-success">Create Bill</button>
+            <a href="{% url 'bill-list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+
+<!-- Hidden Template for New Item (will be cloned by JS) -->
+<div id="empty-form-template" style="display: none;">
+    <div class="form-row border p-3 mb-2 bg-light rounded">
+        {% for field in formset.empty_form %}
+            <div class="col-md-{% if field.name == 'product' %}6{% else %}3{% endif %} form-group">
+                {{ field.label_tag }}
+                {{ field.as_widget }}
+                {% if field.help_text %}
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addItemBtn = document.querySelector('.add-item-btn');
+        const formsetContainer = document.getElementById('formset-container');
+        const totalForms = document.querySelector('#id_items-TOTAL_FORMS');
+
+        addItemBtn.addEventListener('click', function () {
+            const formCount = parseInt(totalForms.value);
+            const template = document.getElementById('empty-form-template').innerHTML;
+            const newFormHtml = template.replace(/__prefix__/g, formCount);
+
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = newFormHtml;
+
+            formsetContainer.appendChild(tempDiv.firstElementChild);
+            totalForms.value = formCount + 1;
+        });
+    });
+</script>
+{% endblock %}

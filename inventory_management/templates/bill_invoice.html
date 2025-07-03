@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice - Bill #{{ bill.id }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            font-size: 10pt;
+            color: #333;
+        }
+        .invoice-box {
+            max-width: 800px;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #eee;
+            box-shadow: 0 0 10px rgba(0, 0, 0, .15);
+            line-height: 20px; /* Slightly tighter line height */
+        }
+        .invoice-box table {
+            width: 100%;
+            line-height: inherit;
+            text-align: left;
+            border-collapse: collapse; /* Ensure borders are merged */
+        }
+        .invoice-box table td {
+            padding: 8px; /* Slightly more padding for readability */
+            vertical-align: top;
+        }
+
+        /* Top section with Logo/Title and Invoice Details */
+        .invoice-box table tr.top table td {
+            padding-bottom: 25px;
+        }
+        .invoice-box table tr.top table td.title {
+            font-size: 38px; /* Slightly smaller for balance */
+            line-height: 38px;
+            color: #555;
+            font-weight: bold;
+        }
+        .invoice-box table tr.top table td:nth-child(2) {
+            text-align: right;
+            font-size: 11pt;
+        }
+
+        /* Information section (Farmer and Company Details) */
+        .invoice-box table tr.information table td {
+            padding-bottom: 30px;
+            width: 50%; /* Make sure each column takes half width */
+        }
+        .invoice-box table tr.information table td:first-child {
+            text-align: left; /* Ensure farmer details align left */
+        }
+        .invoice-box table tr.information table td:last-child {
+            text-align: right; /* Ensure company details align right */
+        }
+        .invoice-box strong {
+            font-weight: bold;
+        }
+
+        /* Items table heading */
+        .invoice-box table tr.heading td {
+            background: #f8f8f8; /* Lighter background */
+            border-bottom: 1px solid #ddd;
+            border-top: 1px solid #ddd;
+            font-weight: bold;
+            padding: 10px 8px; /* More padding for headings */
+        }
+
+        /* Item rows */
+        .invoice-box table tr.item td {
+            border-bottom: 1px dotted #eee; /* Dotted line for subtle separation */
+        }
+        .invoice-box table tr.item.last td {
+            border-bottom: none;
+        }
+        .invoice-box table tr.item td:nth-child(1) { text-align: left; } /* Item */
+        .invoice-box table tr.item td:nth-child(2) { text-align: center; } /* Quantity */
+        .invoice-box table tr.item td:nth-child(3) { text-align: right; } /* Price per unit */
+        .invoice-box table tr.item td:nth-child(4) { text-align: right; } /* Total */
+
+
+        /* Total section */
+        .invoice-box table tr.total td:nth-child(2),
+        .invoice-box table tr.total td:nth-child(3), /* Added for alignment */
+        .invoice-box table tr.total td:nth-child(4) {
+            border-top: 1px solid #eee; /* Single border for consistency */
+            padding-top: 8px;
+            padding-bottom: 2px;
+        }
+        .invoice-box table tr.total.net td {
+            border-top: 2px solid #555; /* Thicker border for Net Total */
+            font-size: 12pt;
+            font-weight: bold;
+            padding-top: 10px;
+        }
+
+        /* Utility classes */
+        .text-right { text-align: right; }
+        .text-left { text-align: left; }
+        .footer-note {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 9pt;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-box">
+        <table>
+            <tr class="top">
+                <td colspan="4"> <table>
+                        <tr>
+                            <td class="title">
+                                InventoryPro
+                            </td>
+                            <td>
+                                <strong>Invoice #:</strong> {{ bill.id }}<br>
+                                <strong>Created:</strong> {{ bill.date|date:"M d, Y" }}<br>
+                                <strong>Due:</strong> N/A
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr class="information">
+                <td colspan="4"> <table>
+                        <tr>
+                            <td>
+                                <strong>Bill To:</strong><br>
+                                <strong>{{ bill.farmer.name }}</strong><br>
+                                {{ bill.farmer.address }}<br>
+                                Mobile No.: {{ bill.farmer.mobile }}
+                            </td>
+                            <td class="text-right">
+                                <strong>From:</strong><br>
+                                <strong>Arun Krushi Kendhr</strong><br>
+                                A/P Save Tal-Sangola Dist-Solapur<br>
+                                Mobile No.: 9623757407
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr class="heading">
+                <td>Item</td>
+                <td style="text-align: center;">Quantity</td>
+                <td class="text-right">Price (per unit)</td>
+                <td class="text-right">Total</td>
+            </tr>
+
+            {% for item in bill.items.all %}
+            <tr class="item{% if forloop.last %} last{% endif %}">
+                <td>{{ item.product.name }}</td>
+                <td style="text-align: center;">{{ item.quantity }}</td>
+                <td class="text-right">₹{{ item.price|floatformat:2 }}</td>
+                <td class="text-right">₹{{ item.total|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+
+            <tr class="total">
+                <td colspan="2"></td> <td class="text-right">Subtotal:</td>
+                <td class="text-right">₹{{ bill.total_amount|floatformat:2 }}</td>
+            </tr>
+            <tr class="total">
+                <td colspan="2"></td>
+                <td class="text-right">GST:</td>
+                <td class="text-right">₹{{ bill.total_gst|floatformat:2 }}</td>
+            </tr>
+            <tr class="total net">
+                <td colspan="2"></td>
+                <td class="text-right">Net Total:</td>
+                <td class="text-right"><strong>₹{{ bill.net_total|floatformat:2 }}</strong></td>
+            </tr>
+        </table>
+
+        <p class="footer-note">Thank you for your business! We appreciate your patronage.</p>
+    </div>
+</body>
+</html>

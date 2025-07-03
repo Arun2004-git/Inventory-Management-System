@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white">
+        <h2>{% if form.instance.pk %}Edit{% else %}Add{% endif %} Vendor Purchase</h2>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <!-- Vendor selection -->
+            <div class="form-group">
+                {{ form.vendor.label_tag }}
+                {{ form.vendor }}
+                {% for error in form.vendor.errors %}
+                    <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <hr>
+            <h4>Purchase Items</h4>
+            {{ formset.management_form }}
+
+            <div id="formset-container">
+                {% for item_form in formset %}
+                    <div class="form-row border p-3 mb-2 bg-light rounded">
+                        {% for field in item_form %}
+                            <div class="col-md-4 form-group">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {% for error in field.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Optional: JavaScript to add more forms dynamically -->
+            <div id="empty-form" class="d-none">
+                <div class="form-row border p-3 mb-2 bg-light rounded">
+                    {% for field in formset.empty_form %}
+                        <div class="col-md-4 form-group">
+                            {{ field.label_tag }}
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <button type="button" class="btn btn-info mb-3" id="add-item">Add Another Item</button>
+
+            <hr>
+            <button type="submit" class="btn btn-success">Save Purchase</button>
+            <a href="{% url 'vendor-purchase-list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addBtn = document.getElementById('add-item');
+        const container = document.getElementById('formset-container');
+        const emptyForm = document.getElementById('empty-form').innerHTML;
+        const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+
+        addBtn.addEventListener('click', function () {
+            let formIndex = parseInt(totalForms.value);
+            let newForm = emptyForm.replace(/__prefix__/g, formIndex);
+            container.insertAdjacentHTML('beforeend', newForm);
+            totalForms.value = formIndex + 1;
+        });
+    });
+</script>
+{% endblock %}

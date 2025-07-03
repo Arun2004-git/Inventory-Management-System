@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Stock Dashboard</h2>
+
+{% if low_stock %}
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong><i class="fas fa-exclamation-triangle"></i> Low Stock Alert!</strong> The following products are running low:
+    <ul>
+      {% for p in low_stock %}
+      <li><strong>{{ p.name }}</strong> - Only {{ p.stock }} left! (Vendor: {{ p.vendor.name }})</li>
+      {% endfor %}
+    </ul>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+{% else %}
+  <div class="alert alert-success" role="alert">
+    All products are currently well stocked!
+  </div>
+{% endif %}
+
+<div class="card mt-4">
+    <div class="card-header bg-info text-white">
+        Product Stock Levels
+    </div>
+    <div class="card-body">
+        <canvas id="stockChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const labels = JSON.parse('{{ labels|safe }}');
+  const data = JSON.parse('{{ data|safe }}');
+
+  const ctx = document.getElementById('stockChart').getContext('2d');
+  new Chart(ctx, {
+      type: 'bar',
+      data: {
+          labels: labels,
+          datasets: [{
+              label: 'Stock Quantity',
+              data: data,
+              backgroundColor: [
+                  'rgba(54, 162, 235, 0.6)', // Blue
+                  'rgba(75, 192, 192, 0.6)', // Green
+                  'rgba(255, 99, 132, 0.6)', // Red
+                  'rgba(255, 159, 64, 0.6)', // Orange
+                  'rgba(153, 102, 255, 0.6)', // Purple
+                  'rgba(201, 203, 207, 0.6)' // Grey
+              ],
+              borderColor: [
+                  'rgba(54, 162, 235, 1)',
+                  'rgba(75, 192, 192, 1)',
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(255, 159, 64, 1)',
+                  'rgba(153, 102, 255, 1)',
+                  'rgba(201, 203, 207, 1)'
+              ],
+              borderWidth: 1
+          }]
+      },
+      options: {
+          responsive: true,
+          scales: {
+              y: {
+                  beginAtZero: true,
+                  title: {
+                      display: true,
+                      text: 'Quantity in Stock'
+                  }
+              },
+              x: {
+                  title: {
+                      display: true,
+                      text: 'Product Name'
+                  }
+              }
+          },
+          plugins: {
+              legend: {
+                  display: false
+              },
+              title: {
+                  display: true,
+                  text: 'Current Product Stock Levels'
+              }
+          }
+      }
+  });
+</script>
+{% endblock %}

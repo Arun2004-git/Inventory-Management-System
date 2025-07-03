@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Bills</h2>
+    <a href="{% url 'bill-add' %}" class="btn btn-primary">Create New Bill</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Bill ID</th>
+                <th>Farmer</th>
+                <th>Date</th>
+                <th>Total Amount (Excl. GST)</th>
+                <th>Total GST</th>
+                <th>Net Total</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bill in bills %}
+            <tr>
+                <td>{{ bill.id }}</td>
+                <td>{{ bill.farmer.name }}</td>
+                <td>{{ bill.date|date:"M d, Y H:i" }}</td>
+                <td>₹{{ bill.total_amount|floatformat:2 }}</td>
+                <td>₹{{ bill.total_gst|floatformat:2 }}</td>
+                <td>₹{{ bill.net_total|floatformat:2 }}</td>
+                <td>
+                    <a href="{% url 'bill-pdf' bill.id %}" class="btn btn-sm btn-info" target="_blank">View PDF</a>
+                    </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center">No bills found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
