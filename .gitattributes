@@ -1,2 +1,3 @@
 *.html linguist-language=Jinja
-*.py linguist-detectable=true
+core/* linguist-language=Python
+*.py linguist-language=Python
